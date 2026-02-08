@@ -19,9 +19,20 @@ export function PolicyUpdates() {
     const [policies, setPolicies] = useState<Policy[]>([])
 
     useEffect(() => {
-        fetch("/data/policy-data.json")
-            .then(res => res.json())
-            .then(data => setPolicies(data.policies.slice(0, 5)))
+        // Try to fetch from API first
+        fetch("/api/policy")
+            .then(async (res) => {
+                if (!res.ok) throw new Error("API call failed")
+                const data = await res.json()
+                setPolicies(data.policies.slice(0, 5))
+            })
+            .catch(() => {
+                // Fallback to local dummy data
+                console.log("Fetching fallback policy data...")
+                fetch("/data/policy-data.json")
+                    .then(res => res.json())
+                    .then(data => setPolicies(data.policies.slice(0, 5)))
+            })
     }, [])
 
     return (
