@@ -169,11 +169,11 @@ export default async function PolicyDetailPage({ params }: PolicyPageProps) {
                                     </div>
                                 ))}
                             </div>
-                            <a href={policy.link || "#"} target="_blank" rel="noopener noreferrer" className="block w-full">
-                                <Button className="w-full h-14 rounded-2xl bg-emerald-500 text-black font-black uppercase tracking-widest hover:bg-emerald-400 transition-all hover:scale-[1.02] active:scale-[0.98]">
+                            <Button asChild className="w-full h-14 rounded-2xl bg-emerald-500 text-black font-black uppercase tracking-widest hover:bg-emerald-400 transition-all hover:scale-[1.02] active:scale-[0.98]">
+                                <a href={policy.link || "#"} target="_blank" rel="noopener noreferrer">
                                     지원 신청하기
-                                </Button>
-                            </a>
+                                </a>
+                            </Button>
                         </div>
 
                         <div className="glass-card rounded-[2rem] p-6 text-center border-white/5">
