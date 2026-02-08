@@ -17,13 +17,25 @@ export default function NewsPage() {
     const [loading, setLoading] = useState(true)
 
     useEffect(() => {
-        fetch("/data/news-data.json")
-            .then((res) => res.json())
-            .then((data) => {
+        // Try to fetch from API first
+        fetch("/api/news")
+            .then(async (res) => {
+                if (!res.ok) throw new Error("API call failed")
+                const data = await res.json()
                 setNews(data)
                 setLoading(false)
             })
-            .catch(() => setLoading(false))
+            .catch(() => {
+                // Fallback to local dummy data
+                console.log("Fetching fallback news data...")
+                fetch("/data/news-data.json")
+                    .then((res) => res.json())
+                    .then((data) => {
+                        setNews(data)
+                        setLoading(false)
+                    })
+                    .catch(() => setLoading(false))
+            })
     }, [])
 
     const stripHtml = (html: string) => {
