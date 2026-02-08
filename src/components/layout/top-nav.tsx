@@ -7,8 +7,8 @@ import { cn } from "@/lib/utils"
 
 const navItems = [
     { title: "대시보드", url: "/" },
+    { title: "그린 체크", url: "/green-check" },
     { title: "수익 계산기", url: "/calc" },
-    { title: "정책 및 보조금", url: "/policy" },
     { title: "시장 뉴스", url: "/news" },
 ]
 

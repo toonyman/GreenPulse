@@ -5,7 +5,6 @@ import { EnergyMixChart } from "@/components/dashboard/energy-mix-chart"
 import { DualAxisChart } from "@/components/dashboard/dual-axis-chart"
 import { RegionalAnalysis } from "@/components/dashboard/regional-analysis"
 import { RE100Card } from "@/components/dashboard/re100-card"
-import { PolicyUpdates } from "@/components/dashboard/policy-updates"
 import { NewsFeed } from "@/components/dashboard/news-feed"
 import { ArrowRight, Newspaper } from "lucide-react"
 import Link from "next/link"
@@ -47,16 +46,9 @@ export default function Home() {
 
         </section>
 
-        {/* Section E: Policy & News (Bottom Section) */}
-        {/* Bottom Section: Policy & News - Flexible Height */}
-        <section className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-stretch min-h-[600px]">
-          {/* Left: Policy (4 Cols) */}
-          <div className="lg:col-span-4 min-h-[600px] h-full">
-            <PolicyUpdates />
-          </div>
-
-          {/* Right: News (8 Cols) */}
-          <div className="lg:col-span-8 min-h-[600px] h-full glass-card rounded-2xl p-6 border-white/5 flex flex-col">
+        {/* Section E: News (Bottom Section) */}
+        <section className="min-h-[600px]">
+          <div className="glass-card rounded-2xl p-6 border-white/5 flex flex-col min-h-[600px]">
             <div className="flex items-center justify-between mb-8">
               <div className="flex items-center gap-3">
                 <div className="p-2 bg-blue-500/10 rounded-lg text-blue-400">
