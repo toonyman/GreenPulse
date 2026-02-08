@@ -9,12 +9,26 @@ import path from "path"
 
 async function getPolicy(id: string) {
     try {
+        // Try API first
+        const apiUrl = `${process.env.NEXT_PUBLIC_BASE_URL || 'http://localhost:3000'}/api/policy`;
+        const apiResponse = await fetch(apiUrl, { cache: 'no-store' });
+
+        if (apiResponse.ok) {
+            const apiData = await apiResponse.json();
+            const policy = apiData.policies?.find((p: any) => String(p.id) === String(id));
+            if (policy) return policy;
+        }
+    } catch (apiError) {
+        console.log("API fetch failed, trying local file...");
+    }
+
+    // Fallback to local JSON
+    try {
         const filePath = path.join(process.cwd(), "public", "data", "policy-data.json")
         const fileContent = await fs.readFile(filePath, "utf-8")
         const data = JSON.parse(fileContent)
-        // Access data directly if array, or data.policies if object
         const policies = Array.isArray(data) ? data : (data.policies || [])
-        return policies.find((p: any) => p.id === id)
+        return policies.find((p: any) => String(p.id) === String(id))
     } catch (error) {
         console.error("Error reading policy data:", error)
         return null

@@ -21,15 +21,26 @@ export default function PolicyPage() {
     const [loading, setLoading] = useState(true)
 
     useEffect(() => {
-        fetch("/data/policy-data.json")
-            .then((res) => res.json())
-            .then((data) => {
-                // Ensure policies is an array from the data.policies key
-                const policyList = Array.isArray(data) ? data : (data.policies || [])
-                setPolicies(policyList)
+        // Try to fetch from API first
+        fetch("/api/policy")
+            .then(async (res) => {
+                if (!res.ok) throw new Error("API call failed")
+                const data = await res.json()
+                setPolicies(data.policies)
                 setLoading(false)
             })
-            .catch(() => setLoading(false))
+            .catch(() => {
+                // Fallback to local dummy data
+                console.log("Fetching fallback policy data...")
+                fetch("/data/policy-data.json")
+                    .then((res) => res.json())
+                    .then((data) => {
+                        const policyList = Array.isArray(data) ? data : (data.policies || [])
+                        setPolicies(policyList)
+                        setLoading(false)
+                    })
+                    .catch(() => setLoading(false))
+            })
     }, [])
 
     const filteredPolicies = policies.filter(p =>
