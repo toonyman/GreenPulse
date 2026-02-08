@@ -64,7 +64,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
                 </div>
                 <div className="flex flex-col gap-0.5 leading-none">
                   <span className="font-semibold text-emerald-500">Green Pulse</span>
-                  <span className="text-xs text-muted-foreground">Eco Energy Dashboard</span>
+                  <span className="text-sm text-muted-foreground/80 font-bold">Eco Energy Dashboard</span>
                 </div>
               </Link>
             </SidebarMenuButton>

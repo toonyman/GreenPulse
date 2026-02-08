@@ -1,9 +1,10 @@
 "use client"
 
-import { EnergyMixChart } from "@/components/dashboard/energy-mix-chart"
-
 import { DualAxisChart } from "@/components/dashboard/dual-axis-chart"
 import { RegionalAnalysis } from "@/components/dashboard/regional-analysis"
+import { EnergyMixCard } from "@/components/dashboard/energy-mix-card"
+import { GreenCheckSummaryCard } from "@/components/dashboard/green-check-summary-card"
+import { GreenInflationTracker } from "@/components/dashboard/green-inflation-tracker"
 import { RE100Card } from "@/components/dashboard/re100-card"
 import { NewsFeed } from "@/components/dashboard/news-feed"
 import { ArrowRight, Newspaper } from "lucide-react"
@@ -24,48 +25,57 @@ export default function Home() {
       </div>
 
       <div className="flex flex-col gap-8">
-        {/* Section B & C: Main Charts & Risk Metrics */}
-        {/* Top Section: Main Market & Intelligence */}
-        {/* Top Section: Main Market & Intelligence (3-Column Layout) */}
+        {/* Tier 1: Core Performance & Regional Status (8:4 Layout) */}
         <section className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-stretch">
-
-          {/* Left Column: Grid Status & Energy Mix (3/12) */}
-          <div className="lg:col-span-3 h-full min-h-[600px]">
-            <RegionalAnalysis />
-          </div>
-
-          {/* Center Column: Main Market Chart (6/12) */}
-          <div className="lg:col-span-6 min-h-[600px]">
+          <div className="lg:col-span-8 min-h-[550px]">
             <DualAxisChart />
           </div>
+          <div className="lg:col-span-4 h-full min-h-[550px]">
+            <RegionalAnalysis />
+          </div>
+        </section>
 
-          {/* Right Column: Corporate RE100 (3/12) */}
-          <div className="lg:col-span-3 h-full min-h-[400px]">
+        {/* Tier 2: Deep Analysis & Insights (4:4:4 Layout) */}
+        <section className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-stretch">
+          <div className="lg:col-span-4 h-full">
+            <EnergyMixCard />
+          </div>
+          <div className="lg:col-span-4 h-full">
+            <GreenCheckSummaryCard />
+          </div>
+          <div className="lg:col-span-4 h-full">
+            <GreenInflationTracker />
+          </div>
+        </section>
+
+        {/* Tier 3: Market Intelligence (3:9 Layout) */}
+        <section className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-stretch">
+          {/* Lower Importance Widgets (3/12) */}
+          <div className="lg:col-span-3 h-full">
             <RE100Card />
           </div>
 
-        </section>
-
-        {/* Section E: News (Bottom Section) */}
-        <section className="min-h-[600px]">
-          <div className="glass-card rounded-2xl p-6 border-white/5 flex flex-col min-h-[600px]">
-            <div className="flex items-center justify-between mb-8">
-              <div className="flex items-center gap-3">
-                <div className="p-2 bg-blue-500/10 rounded-lg text-blue-400">
-                  <Newspaper className="size-5" />
+          {/* News Area (9/12) */}
+          <div className="lg:col-span-9 h-full">
+            <div className="glass-card rounded-[2rem] p-8 border-white/5 flex flex-col h-full min-h-[500px]">
+              <div className="flex items-center justify-between mb-8">
+                <div className="flex items-center gap-3">
+                  <div className="p-2.5 bg-blue-500/10 rounded-xl text-blue-400">
+                    <Newspaper className="size-6" />
+                  </div>
+                  <div>
+                    <h3 className="text-2xl font-black text-white">주요 에너지 뉴스</h3>
+                    <p className="text-sm text-slate-500 font-bold uppercase tracking-wider">글로벌 마켓 인사이트</p>
+                  </div>
                 </div>
-                <div>
-                  <h3 className="text-2xl font-black text-white">주요 에너지 뉴스</h3>
-                  <p className="text-xs text-slate-500 font-bold uppercase tracking-wider">글로벌 마켓 최신 동향</p>
-                </div>
+                <Link href="/news" className="text-sm font-black uppercase tracking-[0.2em] text-slate-500 hover:text-white flex items-center gap-2 transition-all">
+                  뉴스 더보기 <ArrowRight className="size-4" />
+                </Link>
               </div>
-              <Link href="/news" className="text-xs font-bold uppercase tracking-widest text-slate-500 hover:text-white flex items-center gap-2 transition-colors">
-                뉴스 더보기 <ArrowRight className="size-3" />
-              </Link>
-            </div>
 
-            <div className="flex-1 overflow-auto custom-scrollbar pr-4">
-              <NewsFeed />
+              <div className="flex-1 overflow-auto custom-scrollbar pr-4 text-sm font-medium">
+                <NewsFeed />
+              </div>
             </div>
           </div>
         </section>

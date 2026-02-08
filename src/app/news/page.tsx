@@ -74,11 +74,11 @@ export default function NewsPage() {
                                     <div className="relative z-10 flex flex-col gap-8">
                                         <div className="flex items-center justify-between">
                                             <div className="flex items-center gap-4">
-                                                <Badge className="bg-emerald-500 text-black font-black px-4 py-1 rounded-full uppercase tracking-widest text-xs">
+                                                <Badge className="bg-emerald-500 text-black font-black px-4 py-1.5 rounded-full uppercase tracking-widest text-sm">
                                                     주요 소식
                                                 </Badge>
-                                                <span className="text-xs font-black uppercase tracking-widest text-slate-500 flex items-center gap-2">
-                                                    <Calendar className="size-3 text-blue-500" />
+                                                <span className="text-sm font-black uppercase tracking-widest text-slate-500 flex items-center gap-2">
+                                                    <Calendar className="size-3.5 text-blue-500" />
                                                     {new Date(featuredNews.pubDate).toLocaleDateString()}
                                                 </span>
                                             </div>
@@ -101,10 +101,10 @@ export default function NewsPage() {
                                         </div>
 
                                         <div className="pt-8 border-t border-white/5 flex items-center justify-between">
-                                            <div className="flex items-center gap-2 text-sm font-bold text-slate-500 uppercase tracking-widest">
+                                            <div className="flex items-center gap-2 text-base font-bold text-slate-500 uppercase tracking-widest">
                                                 프리미엄 기분 분석 <Sparkles className="size-4 text-emerald-500" />
                                             </div>
-                                            <a href={featuredNews.link} target="_blank" rel="noopener noreferrer" className="flex items-center gap-2 text-sm font-black uppercase tracking-widest text-emerald-400 hover:text-emerald-300 transition-colors">
+                                            <a href={featuredNews.link} target="_blank" rel="noopener noreferrer" className="flex items-center gap-2 text-base font-black uppercase tracking-widest text-emerald-400 hover:text-emerald-300 transition-colors">
                                                 전체 읽기 <ArrowRight className="size-4" />
                                             </a>
                                         </div>
@@ -134,10 +134,10 @@ export default function NewsPage() {
                                             />
                                         </div>
                                         <div className="pt-4 mt-4 border-t border-white/5 flex items-center justify-between">
-                                            <a href={item.link} target="_blank" rel="noopener noreferrer" className="text-xs font-black uppercase tracking-widest text-slate-500 hover:text-white transition-colors">
-                                                자세히 보기 <ArrowRight className="inline size-2.5 ml-1" />
+                                            <a href={item.link} target="_blank" rel="noopener noreferrer" className="text-sm font-black uppercase tracking-widest text-slate-500 hover:text-white transition-colors">
+                                                자세히 보기 <ArrowRight className="inline size-3 ml-1" />
                                             </a>
-                                            <ExternalLink className="size-3 text-slate-700 opacity-50 group-hover:opacity-100 transition-opacity" />
+                                            <ExternalLink className="size-3.5 text-slate-700 opacity-50 group-hover:opacity-100 transition-opacity" />
                                         </div>
                                     </div>
                                 ))}
@@ -178,7 +178,7 @@ export default function NewsPage() {
             </div>
 
             {/* Ad Space */}
-            <div className="w-full h-32 glass-card rounded-3xl border border-dashed border-white/10 flex items-center justify-center text-slate-600 text-xs font-black uppercase tracking-[0.3em]">
+            <div className="w-full h-32 glass-card rounded-3xl border border-dashed border-white/10 flex items-center justify-center text-slate-600 text-sm font-black uppercase tracking-[0.3em]">
                 전략적 파트너 인텔리전스 공간
             </div>
         </div>

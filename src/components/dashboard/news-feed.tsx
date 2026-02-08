@@ -69,9 +69,9 @@ export function NewsFeed() {
                         <p className="text-sm text-slate-400 line-clamp-2 leading-relaxed opacity-80 group-hover:opacity-100 transition-opacity">
                             {stripHtml(item.description)}
                         </p>
-                        <div className="flex items-center gap-4 text-xs font-bold uppercase tracking-widest text-slate-500">
-                            <span className="flex items-center gap-1.5 bg-white/5 px-2 py-1 rounded">
-                                <Calendar className="size-3 text-emerald-500" />
+                        <div className="flex items-center gap-4 text-sm font-bold uppercase tracking-wider text-slate-500">
+                            <span className="flex items-center gap-1.5 bg-white/5 px-2.5 py-1.5 rounded">
+                                <Calendar className="size-3.5 text-emerald-500" />
                                 {new Date(item.pubDate).toLocaleDateString()}
                             </span>
                             <span className="text-emerald-500/60 opacity-0 group-hover:opacity-100 transition-opacity">

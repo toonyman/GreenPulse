@@ -18,7 +18,8 @@
     {
       "id": "copper_price",
       "name": "구리 가격 (LME)",
-      "value": "$9,200/t",
+      "value": "$9,200",
+      "unit": "USD/t",
       "status": "safe",
       "trend": "stable",
       "description": "변압기 및 케이블 제조 원가 안정세 유지"
@@ -26,10 +27,47 @@
     {
       "id": "poly_price",
       "name": "폴리실리콘",
-      "value": "$18/kg",
+      "value": "$18.5",
+      "unit": "USD/kg",
       "status": "safe",
       "trend": "decreasing",
       "description": "모듈 가격 하락 요인으로 작용, 초기 투자비 절감 기대"
+    },
+    {
+      "id": "lithium_price",
+      "name": "리튬 (탄산리튬)",
+      "value": "$13,500",
+      "unit": "USD/t",
+      "status": "warning",
+      "trend": "increasing",
+      "description": "배터리 핵심 소재 가격 반등세 포착"
+    },
+    {
+      "id": "nickel_price",
+      "name": "니켈 (LME)",
+      "value": "$16,200",
+      "unit": "USD/t",
+      "status": "safe",
+      "trend": "decreasing",
+      "description": "공급 과잉으로 인한 하락 안정세"
+    },
+    {
+      "id": "aluminum_price",
+      "name": "알루미늄",
+      "value": "$2,450",
+      "unit": "USD/t",
+      "status": "safe",
+      "trend": "increasing",
+      "description": "프레임 및 구조물 제작 원가 상승 압력"
+    },
+    {
+      "id": "hrc_price",
+      "name": "열연강판 (HRC)",
+      "value": "$880",
+      "unit": "USD/t",
+      "status": "safe",
+      "trend": "stable",
+      "description": "발전 설비 지지 구조물 원가 기초 지표"
     }
   ],
   "solar_rankings": [

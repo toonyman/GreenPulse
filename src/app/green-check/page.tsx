@@ -5,8 +5,15 @@ import { Card } from "@/components/ui/card"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Badge } from "@/components/ui/badge"
 import { Radar, RadarChart, PolarGrid, PolarAngleAxis, PolarRadiusAxis, ResponsiveContainer, Tooltip } from "recharts"
-import { MapPin, TrendingUp, Zap, Network, DollarSign, Award, Sparkles } from "lucide-react"
+import { MapPin, TrendingUp, Zap, Network, DollarSign, Award, Sparkles, Info } from "lucide-react"
+import {
+    Tooltip as ShadcnTooltip,
+    TooltipContent,
+    TooltipProvider,
+    TooltipTrigger,
+} from "@/components/ui/tooltip"
 import { cn } from "@/lib/utils"
+import { SimpleRegionSelector } from "@/components/simple-region-selector"
 
 interface LocationData {
     name: string
@@ -18,6 +25,7 @@ interface LocationData {
     total_score: number
     grade: string
     ai_summary: string
+    last_updated: string
 }
 
 interface LocationMaster {
@@ -117,162 +125,194 @@ export default function GreenCheckPage() {
                 </p>
             </div>
 
-            {/* 지역 선택 */}
-            <div className="glass-card rounded-2xl p-6 border-white/5">
-                <div className="flex items-center gap-3 mb-6">
-                    <MapPin className="size-5 text-emerald-500" />
-                    <h3 className="text-lg font-black text-white">지역 선택</h3>
-                </div>
+            {/* 메인 레이아웃: 전체 너비 분석 결과 */}
+            <div className="max-w-7xl mx-auto w-full">
+                {currentData ? (
+                    <Card className="glass-card rounded-2xl p-5 border-white/5">
+                        <div className="space-y-4">
+                            {/* 초간소화 헤더 */}
+                            <div className="flex flex-col sm:flex-row sm:items-center justify-between pb-3 border-b border-white/10 gap-3">
+                                <div className="flex items-center gap-3">
+                                    <div className="w-1.5 h-6 bg-emerald-500 rounded-full" />
+                                    <h2 className="text-xl font-black text-white">{currentData.province} {currentData.name}</h2>
+                                </div>
 
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <div className="space-y-2">
-                        <label className="text-xs font-black uppercase tracking-widest text-slate-500">시/도</label>
-                        <Select value={selectedProvince} onValueChange={handleProvinceChange}>
-                            <SelectTrigger className="h-12 bg-white/5 border-white/10 rounded-xl text-white font-bold">
-                                <SelectValue placeholder="시/도를 선택하세요" />
-                            </SelectTrigger>
-                            <SelectContent>
-                                {provinces.map(province => (
-                                    <SelectItem key={province} value={province}>{province}</SelectItem>
-                                ))}
-                            </SelectContent>
-                        </Select>
-                    </div>
+                                <div className="flex items-center gap-2 bg-white/5 p-1 rounded-xl border border-white/5">
+                                    <Select value={selectedProvince} onValueChange={handleProvinceChange}>
+                                        <SelectTrigger className="w-[120px] h-9 bg-transparent border-0 text-white font-bold text-sm focus:ring-0">
+                                            <SelectValue placeholder="시/도" />
+                                        </SelectTrigger>
+                                        <SelectContent>
+                                            {provinces.map(province => (
+                                                <SelectItem key={province} value={province}>{province}</SelectItem>
+                                            ))}
+                                        </SelectContent>
+                                    </Select>
+                                    <div className="w-px h-3 bg-white/10" />
+                                    <Select value={selectedRegion} onValueChange={handleRegionChange} disabled={!selectedProvince}>
+                                        <SelectTrigger className="w-[120px] h-9 bg-transparent border-0 text-white font-bold text-sm focus:ring-0">
+                                            <SelectValue placeholder="시/군/구" />
+                                        </SelectTrigger>
+                                        <SelectContent>
+                                            {regions.map(({ code, name }) => (
+                                                <SelectItem key={code} value={code}>{name}</SelectItem>
+                                            ))}
+                                        </SelectContent>
+                                    </Select>
+                                </div>
+                            </div>
 
-                    <div className="space-y-2">
-                        <label className="text-xs font-black uppercase tracking-widest text-slate-500">시/군/구</label>
-                        <Select value={selectedRegion} onValueChange={handleRegionChange} disabled={!selectedProvince}>
-                            <SelectTrigger className="h-12 bg-white/5 border-white/10 rounded-xl text-white font-bold">
-                                <SelectValue placeholder="시/군/구를 선택하세요" />
-                            </SelectTrigger>
-                            <SelectContent>
-                                {regions.map(({ code, name }) => (
-                                    <SelectItem key={code} value={code}>{name}</SelectItem>
-                                ))}
-                            </SelectContent>
-                        </Select>
-                    </div>
-                </div>
+                            {/* 메인 콘텐츠: 비대칭 2단 구성 (상세 분석 강조 레이아웃) */}
+                            <div className="grid grid-cols-1 lg:grid-cols-12 gap-4">
+                                {/* 좌측: 종합 요약 (4/12) - 위아래 수직 배치 */}
+                                <div className="lg:col-span-4 flex flex-col gap-4">
+                                    {/* 종합 점수 & 등급 */}
+                                    <div className="p-6 bg-white/5 rounded-xl border border-white/10 text-center flex flex-col justify-center min-h-[160px]">
+                                        <div className="flex items-center justify-center gap-1.5 mb-2.5">
+                                            <Award className="size-4 text-emerald-500" />
+                                            <span className="text-sm font-black uppercase text-slate-500 tracking-wider">Overall Performance</span>
+                                        </div>
+                                        <div className="flex items-center justify-center gap-5 mb-2">
+                                            <div className="text-7xl font-black text-white tracking-tighter">{currentData.total_score}</div>
+                                            <div className={cn(
+                                                "text-4xl font-black w-16 h-16 rounded-2xl flex items-center justify-center border-2",
+                                                currentData.grade === 'S' && "bg-emerald-400/10 text-emerald-400 border-emerald-400/30",
+                                                currentData.grade === 'A' && "bg-blue-400/10 text-blue-400 border-blue-400/30",
+                                                currentData.grade === 'B' && "bg-purple-400/10 text-purple-400 border-purple-400/30",
+                                                currentData.grade === 'C' && "bg-amber-400/10 text-amber-400 border-amber-400/30",
+                                                currentData.grade === 'D' && "bg-red-400/10 text-red-400 border-red-400/30"
+                                            )}>
+                                                {currentData.grade}
+                                            </div>
+                                        </div>
+                                        <div className="text-sm font-bold text-slate-500 uppercase tracking-widest">
+                                            {getGradeLabel(currentData.grade)} 등급 리포트
+                                        </div>
+                                    </div>
+
+                                    {/* AI 인사이트 */}
+                                    <div className="p-6 bg-emerald-500/5 rounded-xl border border-emerald-500/10 flex-1">
+                                        <div className="flex items-center gap-2 mb-4">
+                                            <Sparkles className="size-4 text-emerald-400" />
+                                            <span className="text-sm font-black uppercase text-emerald-400 tracking-wider">AI Deep Insight</span>
+                                        </div>
+                                        <p className="text-base text-slate-300 leading-relaxed font-medium">
+                                            {currentData.ai_summary}
+                                        </p>
+                                    </div>
+                                </div>
+
+                                {/* 우측: 상세 분석 그룹 (8/12) - Metrics + Radar 통합 및 강조 */}
+                                <div className="lg:col-span-8 p-6 bg-white/5 rounded-xl border border-white/10">
+                                    <div className="flex items-center justify-between mb-6">
+                                        <div className="flex items-center gap-2">
+                                            <TrendingUp className="size-4 text-emerald-500" />
+                                            <span className="text-sm font-black uppercase text-slate-500 tracking-wider">Detailed Analysis</span>
+                                        </div>
+                                        <div className="text-sm font-bold text-slate-500 bg-white/5 px-2.5 py-1 rounded-md border border-white/5">
+                                            지표 균형 및 항목별 상세 데이터
+                                        </div>
+                                    </div>
+
+                                    <div className="grid grid-cols-1 md:grid-cols-12 gap-8 items-center">
+                                        {/* Metrics List (5/12) */}
+                                        <div className="md:col-span-5 space-y-2">
+                                            <TooltipProvider>
+                                                <ScoreItem
+                                                    icon={<Zap className="size-3.5" />}
+                                                    label="일사량 지수"
+                                                    score={currentData.solar_score}
+                                                    description="지역별 연간 평균 일사량과 발전 효율을 기반으로 산출된 태양광 발전 잠재력 점수입니다."
+                                                />
+                                                <ScoreItem
+                                                    icon={<Network className="size-3.5" />}
+                                                    label="계통망 수용가"
+                                                    score={currentData.grid_score}
+                                                    description="전력 계통망의 여유 용량과 신규 설비 연계 가능성을 나타내는 지표입니다."
+                                                />
+                                                <ScoreItem
+                                                    icon={<MapPin className="size-3.5" />}
+                                                    label="설비 밀집도"
+                                                    score={currentData.density_score}
+                                                    description="해당 지역 내 기존 재생에너지 설비의 분포와 부지 확보 용이성을 분석한 점수입니다."
+                                                />
+                                                <ScoreItem
+                                                    icon={<DollarSign className="size-3.5" />}
+                                                    label="지자체 보조금"
+                                                    score={currentData.subsidy_score}
+                                                    description="지자체별 조례 및 친환경 정책에 따른 인센티브와 보조금 지원 수준입니다."
+                                                />
+                                            </TooltipProvider>
+                                        </div>
+
+                                        {/* Radar Chart (7/12) */}
+                                        <div className="md:col-span-7 h-[280px] w-full mt-4 md:mt-0">
+                                            <ResponsiveContainer width="100%" height="100%">
+                                                <RadarChart data={radarData} margin={{ top: 0, right: 40, bottom: 0, left: 40 }}>
+                                                    <PolarGrid stroke="#ffffff15" />
+                                                    <PolarAngleAxis
+                                                        dataKey="subject"
+                                                        tick={{ fill: '#94a3b8', fontSize: 11, fontWeight: 'bold' }}
+                                                    />
+                                                    <PolarRadiusAxis domain={[0, 100]} tick={false} axisLine={false} />
+                                                    <Radar
+                                                        name="점수"
+                                                        dataKey="value"
+                                                        stroke="#10b981"
+                                                        fill="#10b981"
+                                                        fillOpacity={0.2}
+                                                        strokeWidth={3}
+                                                    />
+                                                </RadarChart>
+                                            </ResponsiveContainer>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </Card>
+                ) : (
+                    <Card className="glass-card rounded-2xl p-10 border-white/5 text-center flex items-center justify-center">
+                        <div className="space-y-6">
+                            <div className="text-5xl animate-bounce">🌱</div>
+                            <div className="space-y-2">
+                                <h3 className="text-2xl font-black text-white">지역을 선택하세요</h3>
+                                <p className="text-slate-400 font-medium text-sm">
+                                    상단 메뉴에서 지역을 선택하여 분석 리포트를 확인하세요.
+                                </p>
+                            </div>
+                            <div className="flex items-center justify-center gap-2 bg-white/5 p-1.5 rounded-xl border border-white/10 w-fit mx-auto">
+                                <Select value={selectedProvince} onValueChange={handleProvinceChange}>
+                                    <SelectTrigger className="w-[140px] h-10 bg-white/5 border-0 text-white font-bold text-sm focus:ring-0 rounded-lg">
+                                        <SelectValue placeholder="시/도" />
+                                    </SelectTrigger>
+                                    <SelectContent>
+                                        {provinces.map(province => (
+                                            <SelectItem key={province} value={province}>{province}</SelectItem>
+                                        ))}
+                                    </SelectContent>
+                                </Select>
+                                <Select value={selectedRegion} onValueChange={handleRegionChange} disabled={!selectedProvince}>
+                                    <SelectTrigger className="w-[140px] h-10 bg-white/5 border-0 text-white font-bold text-sm focus:ring-0 rounded-lg">
+                                        <SelectValue placeholder="시/군/구" />
+                                    </SelectTrigger>
+                                    <SelectContent>
+                                        {regions.map(({ code, name }) => (
+                                            <SelectItem key={code} value={code}>{name}</SelectItem>
+                                        ))}
+                                    </SelectContent>
+                                </Select>
+                            </div>
+                        </div>
+                    </Card>
+                )}
             </div>
-
-            {/* 데이터 표시 */}
-            {currentData ? (
-                <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
-                    {/* 좌측: 종합 등급 카드 */}
-                    <div className="lg:col-span-4 space-y-6">
-                        {/* 종합 등급 */}
-                        <Card className={cn(
-                            "glass-card rounded-2xl p-8 border-2 relative overflow-hidden",
-                            getGradeColor(currentData.grade)
-                        )}>
-                            <div className="relative z-10">
-                                <div className="flex items-center gap-2 mb-4">
-                                    <Award className="size-5" />
-                                    <span className="text-xs font-black uppercase tracking-widest">종합 등급</span>
-                                </div>
-                                <div className="text-center space-y-2">
-                                    <div className="text-8xl font-black tracking-tighter">{currentData.grade}</div>
-                                    <div className="text-xl font-bold">{getGradeLabel(currentData.grade)}</div>
-                                    <div className="text-3xl font-black">{currentData.total_score}점</div>
-                                </div>
-                            </div>
-                            <div className="absolute -right-10 -bottom-10 size-40 bg-white/5 rounded-full blur-3xl" />
-                        </Card>
-
-                        {/* 세부 점수 */}
-                        <Card className="glass-card rounded-2xl p-6 border-white/5 space-y-4">
-                            <div className="flex items-center gap-2 mb-2">
-                                <TrendingUp className="size-5 text-emerald-500" />
-                                <span className="text-sm font-black uppercase tracking-widest text-white">세부 점수</span>
-                            </div>
-
-                            <div className="space-y-3">
-                                <ScoreItem icon={<Zap className="size-4" />} label="일사량" score={currentData.solar_score} />
-                                <ScoreItem icon={<Network className="size-4" />} label="선로 용량" score={currentData.grid_score} />
-                                <ScoreItem icon={<MapPin className="size-4" />} label="설치 밀집도" score={currentData.density_score} />
-                                <ScoreItem icon={<DollarSign className="size-4" />} label="보조금 수준" score={currentData.subsidy_score} />
-                            </div>
-                        </Card>
-                    </div>
-
-                    {/* 중앙: 레이더 차트 */}
-                    <div className="lg:col-span-8">
-                        <Card className="glass-card rounded-2xl p-8 border-white/5 h-full">
-                            <div className="flex items-center gap-3 mb-8">
-                                <Sparkles className="size-6 text-emerald-500" />
-                                <div>
-                                    <h3 className="text-2xl font-black text-white">투자 적합성 분석</h3>
-                                    <p className="text-sm text-slate-500 font-bold">{currentData.province} {currentData.name}</p>
-                                </div>
-                            </div>
-
-                            {/* 레이더 차트 */}
-                            <div className="h-[400px] mb-8">
-                                <ResponsiveContainer width="100%" height="100%">
-                                    <RadarChart data={radarData}>
-                                        <PolarGrid stroke="#ffffff20" />
-                                        <PolarAngleAxis
-                                            dataKey="subject"
-                                            tick={{ fill: '#94a3b8', fontSize: 14, fontWeight: 'bold' }}
-                                        />
-                                        <PolarRadiusAxis
-                                            angle={90}
-                                            domain={[0, 100]}
-                                            tick={{ fill: '#64748b', fontSize: 12 }}
-                                        />
-                                        <Radar
-                                            name="점수"
-                                            dataKey="value"
-                                            stroke="#10b981"
-                                            fill="#10b981"
-                                            fillOpacity={0.3}
-                                            strokeWidth={2}
-                                        />
-                                        <Tooltip
-                                            contentStyle={{
-                                                backgroundColor: '#1e293b',
-                                                border: '1px solid #334155',
-                                                borderRadius: '0.5rem',
-                                                color: '#fff'
-                                            }}
-                                        />
-                                    </RadarChart>
-                                </ResponsiveContainer>
-                            </div>
-
-                            {/* AI 요약 */}
-                            <div className="glass-card rounded-xl p-6 bg-emerald-500/5 border border-emerald-500/20">
-                                <div className="flex items-start gap-3">
-                                    <div className="p-2 bg-emerald-500/10 rounded-lg text-emerald-400 mt-1">
-                                        <Sparkles className="size-5" />
-                                    </div>
-                                    <div className="flex-1">
-                                        <h4 className="text-sm font-black uppercase tracking-widest text-emerald-400 mb-2">AI 분석 요약</h4>
-                                        <p className="text-slate-300 leading-relaxed font-medium">{currentData.ai_summary}</p>
-                                    </div>
-                                </div>
-                            </div>
-                        </Card>
-                    </div>
-                </div>
-            ) : (
-                <Card className="glass-card rounded-2xl p-12 border-white/5 text-center">
-                    <div className="space-y-4">
-                        <div className="text-6xl">🌱</div>
-                        <h3 className="text-2xl font-black text-white">지역을 선택해주세요</h3>
-                        <p className="text-slate-500 font-medium">
-                            시/도와 시/군/구를 선택하시면<br />
-                            해당 지역의 친환경 투자 적합성 분석 결과를 확인하실 수 있습니다.
-                        </p>
-                    </div>
-                </Card>
-            )}
         </div>
     )
 }
 
 // 점수 아이템 컴포넌트
-function ScoreItem({ icon, label, score }: { icon: React.ReactNode; label: string; score: number }) {
+function ScoreItem({ icon, label, score, description }: { icon: React.ReactNode; label: string; score: number; description: string }) {
     const getScoreColor = (score: number) => {
         if (score >= 80) return 'bg-emerald-500'
         if (score >= 60) return 'bg-blue-500'
@@ -281,19 +321,33 @@ function ScoreItem({ icon, label, score }: { icon: React.ReactNode; label: strin
     }
 
     return (
-        <div className="space-y-2">
-            <div className="flex items-center justify-between">
-                <div className="flex items-center gap-2 text-slate-300">
+        <div className="flex items-center justify-between py-2 border-b border-white/5 last:border-0 last:pb-0">
+            <div className="flex items-center gap-2 text-slate-400">
+                <div className="p-1 bg-white/5 rounded-md">
                     {icon}
-                    <span className="text-sm font-bold">{label}</span>
                 </div>
-                <span className="text-lg font-black text-white">{score}</span>
+                <div className="flex items-center gap-1.5">
+                    <span className="text-sm font-bold">{label}</span>
+                    <ShadcnTooltip>
+                        <TooltipTrigger asChild>
+                            <button className="text-slate-600 hover:text-slate-400 transition-colors">
+                                <Info className="size-3.5" />
+                            </button>
+                        </TooltipTrigger>
+                        <TooltipContent className="bg-slate-900 border-white/10 text-white text-[13px] max-w-[220px] p-3 leading-relaxed">
+                            {description}
+                        </TooltipContent>
+                    </ShadcnTooltip>
+                </div>
             </div>
-            <div className="h-2 bg-white/5 rounded-full overflow-hidden">
-                <div
-                    className={cn("h-full rounded-full transition-all", getScoreColor(score))}
-                    style={{ width: `${score}%` }}
-                />
+            <div className="flex items-center gap-3">
+                <div className="w-16 h-1 bg-white/5 rounded-full overflow-hidden hidden sm:block">
+                    <div
+                        className={cn("h-full rounded-full transition-all", getScoreColor(score))}
+                        style={{ width: `${score}%` }}
+                    />
+                </div>
+                <span className="text-sm font-black text-white w-5 text-right">{score}</span>
             </div>
         </div>
     )

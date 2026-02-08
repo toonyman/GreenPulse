@@ -124,7 +124,7 @@ export default function CalcPage() {
 
                         <div className="relative z-10 flex flex-col gap-10">
                             <div>
-                                <Badge className="bg-emerald-500 text-black font-black px-4 py-1 rounded-full uppercase tracking-widest text-xs mb-4">프로젝션 결과</Badge>
+                                <Badge className="bg-emerald-500 text-black font-black px-4 py-1.5 rounded-full uppercase tracking-widest text-sm mb-4">프로젝션 결과</Badge>
                                 <h3 className="text-4xl md:text-5xl font-black text-white tracking-tighter leading-none mb-2">총 예상 수익률</h3>
                                 <div className="flex items-baseline gap-2">
                                     <span className="text-7xl md:text-8xl font-black text-emerald-400 tracking-tighter font-mono">
@@ -136,9 +136,9 @@ export default function CalcPage() {
 
                             <div className="grid grid-cols-2 gap-6 pt-10 border-t border-white/5">
                                 <div className="space-y-2">
-                                    <p className="text-xs font-black uppercase tracking-[0.2em] text-slate-500">연간 예상 수익</p>
+                                    <p className="text-sm font-black uppercase tracking-[0.2em] text-slate-500">연간 예상 수익</p>
                                     <p className="text-3xl font-black text-white font-mono tracking-tighter">
-                                        <span className="text-sm mr-1">₩</span>{(annualRevenue / 10000).toLocaleString()} <span className="text-sm text-slate-500 uppercase font-black tracking-normal ml-1">만원</span>
+                                        <span className="text-base mr-1">₩</span>{(annualRevenue / 10000).toLocaleString()} <span className="text-base text-slate-500 uppercase font-black tracking-normal ml-1">만원</span>
                                     </p>
                                 </div>
                                 <div className="space-y-2">
@@ -160,9 +160,9 @@ export default function CalcPage() {
                                     </div>
                                 </div>
                                 <div className="text-center md:text-right">
-                                    <p className="text-white/80 text-xs font-black uppercase tracking-widest mb-1">연간 식재 효과</p>
+                                    <p className="text-white/80 text-sm font-black uppercase tracking-widest mb-1.5">연간 식재 효과</p>
                                     <p className="text-white text-5xl font-black tracking-tighter font-mono leading-none">
-                                        {Math.round(treeCount).toLocaleString()} <span className="text-xl uppercase tracking-normal">그루</span>
+                                        {Math.round(treeCount).toLocaleString()} <span className="text-2xl uppercase tracking-normal">그루</span>
                                     </p>
                                 </div>
                             </div>

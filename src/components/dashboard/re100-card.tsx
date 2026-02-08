@@ -30,7 +30,7 @@ export function RE100Card() {
                 </div>
                 <div>
                     <h3 className="text-lg font-black text-white">RE100 랭킹</h3>
-                    <p className="text-xs text-slate-500 font-bold uppercase tracking-wider">재생에너지 구매 TOP 5</p>
+                    <p className="text-sm text-slate-500 font-bold uppercase tracking-wider">재생에너지 구매 TOP 5</p>
                 </div>
             </div>
 
@@ -40,7 +40,7 @@ export function RE100Card() {
                         <div className="flex justify-between items-start mb-3">
                             <div className="flex items-center gap-3">
                                 <div className={cn(
-                                    "size-6 flex items-center justify-center rounded-md text-[10px] font-black",
+                                    "size-7 flex items-center justify-center rounded-md text-xs font-black",
                                     i === 0 ? "bg-amber-500 text-black" :
                                         i === 1 ? "bg-slate-300 text-slate-800" :
                                             i === 2 ? "bg-orange-700 text-orange-200" :
@@ -50,7 +50,7 @@ export function RE100Card() {
                                 </div>
                                 <span className="font-bold text-white text-sm">{item.company}</span>
                             </div>
-                            <span className="text-xs text-emerald-400 font-black tracking-wide">{item.rate}</span>
+                            <span className="text-sm text-emerald-400 font-black tracking-wide">{item.rate}</span>
                         </div>
 
                         <div className="h-1.5 w-full bg-white/10 rounded-full overflow-hidden mb-3">
@@ -62,12 +62,12 @@ export function RE100Card() {
 
                         <div className="flex justify-between items-center pt-2 border-t border-white/5">
                             <div className="flex items-center gap-1.5 text-slate-500">
-                                <Trophy className="size-3" />
-                                <span className="text-[10px] uppercase font-bold">Target {item.target}</span>
+                                <Trophy className="size-3.5" />
+                                <span className="text-xs uppercase font-bold">Target {item.target}</span>
                             </div>
-                            <div className="flex items-center gap-1.5">
-                                <Coins className="size-3 text-emerald-500" />
-                                <span className="text-xs font-mono font-black text-white">{item.purchase}</span>
+                            <div className="flex items-center gap-2">
+                                <Coins className="size-3.5 text-emerald-500" />
+                                <span className="text-sm font-mono font-black text-white">{item.purchase}</span>
                             </div>
                         </div>
                     </div>

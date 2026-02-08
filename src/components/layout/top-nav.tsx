@@ -24,7 +24,7 @@ export function TopNav() {
                     </div>
                     <div className="flex flex-col gap-0 leading-none">
                         <span className="font-black text-xl tracking-tighter text-white group-hover:text-emerald-400 transition-colors">Green Pulse</span>
-                        <span className="text-xs text-emerald-500/80 font-black uppercase tracking-[0.2em] hidden sm:block">Eco Energy Intel</span>
+                        <span className="text-[13px] text-emerald-500/80 font-black uppercase tracking-widest hidden sm:block">Eco Energy Intel</span>
                     </div>
                 </Link>
 

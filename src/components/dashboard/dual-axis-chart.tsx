@@ -5,7 +5,13 @@ import {
     LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer
 } from "recharts"
 import { Badge } from "@/components/ui/badge"
-import { TrendingUp, TrendingDown, Minus, Zap, Leaf, Coins, ExternalLink, Activity } from "lucide-react"
+import { TrendingUp, TrendingDown, Minus, Zap, Leaf, Coins, Info, Activity } from "lucide-react"
+import {
+    Tooltip as ShadcnTooltip,
+    TooltipContent,
+    TooltipProvider,
+    TooltipTrigger,
+} from "@/components/ui/tooltip"
 import { cn } from "@/lib/utils"
 
 interface MarketData {
@@ -21,14 +27,12 @@ interface MarketData {
 export function DualAxisChart() {
     const [data, setData] = useState<MarketData | null>(null)
     const [activeTab, setActiveTab] = useState<"ALL" | "SMP" | "REC" | "CARBON">("ALL")
-    const [commodities, setCommodities] = useState<any[]>([])
 
     useEffect(() => {
         fetch("/data/market-data.json")
             .then(res => res.json())
             .then(json => {
                 setData(json)
-                if (json.risk_metrics) setCommodities(json.risk_metrics.filter((m: any) => m.id.includes('price')))
             })
     }, [])
 
@@ -46,25 +50,27 @@ export function DualAxisChart() {
     const metrics = [
         {
             id: "SMP",
-            label: "SMP (실시간)",
+            label: "SMP (실시간 도매가)",
             value: `${current.smp.toFixed(2)}`,
             unit: "원/kWh",
             change: smpChange,
             icon: Zap,
             color: "text-blue-500",
             yAxisId: "left",
-            lineColor: "#3b82f6"
+            lineColor: "#3b82f6",
+            description: "계통한계가격(System Marginal Price)으로, 한국전력이 발전사로부터 전력을 사오는 도매 가격입니다. 보통 국제 유가 및 LNG 가격에 연동됩니다."
         },
         {
             id: "REC",
-            label: "REC (현물 평균)",
+            label: "REC (신재생 인증서)",
             value: `${current.rec.toLocaleString()}`,
             unit: "원/REC",
             change: recChange,
             icon: Coins,
             color: "text-emerald-500",
             yAxisId: "right",
-            lineColor: "#10b981"
+            lineColor: "#10b981",
+            description: "신재생에너지 공급인증서(Renewable Energy Certificate)입니다. 전력을 생산할 때 발행되며, SMP 외에 추가 수익원이 됩니다."
         },
         {
             id: "CARBON",
@@ -75,7 +81,8 @@ export function DualAxisChart() {
             icon: Leaf,
             color: "text-orange-500",
             yAxisId: "right",
-            lineColor: "#f97316"
+            lineColor: "#f97316",
+            description: "온실가스 배출권 거래제에 따른 배출권 가격입니다. 기업이 온실가스를 배출할 수 있는 권리를 시장에서 거래하는 지표입니다."
         }
     ]
 
@@ -103,15 +110,15 @@ export function DualAxisChart() {
             <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-6 gap-4">
                 <div>
                     <h3 className="text-xl font-black text-white tracking-tight uppercase">에너지 마켓 트렌드 (7일)</h3>
-                    <p className="text-xs text-slate-500 font-bold mt-1">주요 에너지 지표 통합 분석 제공</p>
+                    <p className="text-sm text-slate-500 font-bold mt-1.5">주요 에너지 지표 통합 분석 및 추이 정보</p>
                 </div>
-                <div className="flex gap-1 bg-slate-900/50 p-1 rounded-lg border border-white/5">
+                <div className="flex gap-1 bg-slate-900/50 p-1.5 rounded-xl border border-white/5">
                     {["ALL", "SMP", "REC", "CARBON"].map((tab) => (
                         <button
                             key={tab}
                             onClick={() => setActiveTab(tab as any)}
                             className={cn(
-                                "px-3 py-1.5 text-[10px] font-black uppercase tracking-wider rounded-md transition-all",
+                                "px-3.5 py-1.5 text-xs font-black uppercase tracking-wider rounded-lg transition-all",
                                 activeTab === tab
                                     ? "bg-slate-800 text-white shadow-sm"
                                     : "text-slate-500 hover:text-slate-300 hover:bg-white/5"
@@ -129,28 +136,42 @@ export function DualAxisChart() {
                     <div
                         key={i}
                         className={cn(
-                            "rounded-xl p-4 flex flex-col justify-between transition-all cursor-pointer border",
+                            "rounded-xl p-5 flex flex-col justify-between transition-all cursor-pointer border",
                             activeTab === metric.id || activeTab === "ALL"
                                 ? "bg-white/[0.03] border-white/10"
                                 : "bg-transparent border-transparent opacity-50 hover:opacity-100 hover:bg-white/[0.02]"
                         )}
                         onClick={() => setActiveTab(metric.id as any)}
                     >
-                        <div className="flex justify-between items-start mb-2">
+                        <div className="flex justify-between items-start mb-3">
                             <div className="flex items-center gap-2">
                                 <metric.icon className={cn("size-4", metric.color)} />
-                                <span className="text-[10px] font-black uppercase tracking-widest text-slate-400">{metric.id}</span>
+                                <div className="flex items-center gap-1.5">
+                                    <span className="text-xs font-black uppercase tracking-widest text-slate-400">{metric.id}</span>
+                                    <TooltipProvider>
+                                        <ShadcnTooltip>
+                                            <TooltipTrigger asChild onClick={(e) => e.stopPropagation()}>
+                                                <button className="text-slate-600 hover:text-slate-400">
+                                                    <Info className="size-3" />
+                                                </button>
+                                            </TooltipTrigger>
+                                            <TooltipContent className="bg-slate-900 border-white/10 text-white text-[13px] max-w-[220px] p-4 leading-relaxed">
+                                                {(metric as any).description}
+                                            </TooltipContent>
+                                        </ShadcnTooltip>
+                                    </TooltipProvider>
+                                </div>
                             </div>
-                            <div className={cn("flex items-center gap-1 text-[10px] font-bold",
+                            <div className={cn("flex items-center gap-1 text-[11px] font-bold",
                                 metric.change > 0 ? "text-red-400" : metric.change < 0 ? "text-blue-400" : "text-slate-400"
                             )}>
-                                {metric.change > 0 ? <TrendingUp className="size-3" /> : metric.change < 0 ? <TrendingDown className="size-3" /> : <Minus className="size-3" />}
+                                {metric.change > 0 ? <TrendingUp className="size-3.5" /> : metric.change < 0 ? <TrendingDown className="size-3.5" /> : <Minus className="size-3.5" />}
                                 {Math.abs(metric.change).toFixed(2)}%
                             </div>
                         </div>
-                        <div className="flex items-baseline gap-1">
-                            <span className="text-xl font-black text-white font-mono tracking-tighter">{metric.value}</span>
-                            <span className="text-[10px] text-slate-500 font-bold">{metric.unit}</span>
+                        <div className="flex items-baseline gap-1.5">
+                            <span className="text-2xl font-black text-white font-mono tracking-tighter">{metric.value}</span>
+                            <span className="text-xs text-slate-500 font-bold">{metric.unit}</span>
                         </div>
                     </div>
                 ))}
@@ -164,7 +185,7 @@ export function DualAxisChart() {
                         <XAxis
                             dataKey="date"
                             stroke="rgba(255,255,255,0.3)"
-                            fontSize={10}
+                            fontSize={11}
                             tickLine={false}
                             axisLine={false}
                             tickFormatter={(val) => val.split('-').slice(1).join('/')}
@@ -176,7 +197,7 @@ export function DualAxisChart() {
                                 yAxisId="left"
                                 orientation="left"
                                 stroke="#60a5fa"
-                                fontSize={10}
+                                fontSize={11}
                                 tickLine={false}
                                 axisLine={false}
                                 tickFormatter={(val) => val.toFixed(0)}
@@ -189,7 +210,7 @@ export function DualAxisChart() {
                                 yAxisId="right"
                                 orientation="right"
                                 stroke="#34d399"
-                                fontSize={10}
+                                fontSize={11}
                                 tickLine={false}
                                 axisLine={false}
                                 tickFormatter={(val) => (val / 1000).toFixed(0) + 'k'}
@@ -212,28 +233,6 @@ export function DualAxisChart() {
                 </ResponsiveContainer>
             </div>
 
-            {/* Green Inflation Tracker (New Feature) */}
-            {commodities.length > 0 && (
-                <div className="mt-4 pt-4 border-t border-white/5">
-                    <div className="flex items-center gap-2 mb-2">
-                        <Activity className="size-3 text-emerald-500" />
-                        <span className="text-[10px] font-black uppercase tracking-widest text-emerald-500">Green Inflation Tracker</span>
-                    </div>
-                    <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-                        {commodities.map((item, i) => (
-                            <div key={i} className="flex items-center justify-between bg-white/[0.02] rounded-lg px-3 py-2 border border-white/5">
-                                <span className="text-[10px] text-slate-400 font-bold">{item.name}</span>
-                                <div className="flex items-center gap-2">
-                                    <span className="text-xs font-mono font-black text-white">{item.value}</span>
-                                    {item.trend === 'increasing' ? <TrendingUp className="size-3 text-red-500" /> :
-                                        item.trend === 'decreasing' ? <TrendingDown className="size-3 text-blue-500" /> :
-                                            <Minus className="size-3 text-slate-500" />}
-                                </div>
-                            </div>
-                        ))}
-                    </div>
-                </div>
-            )}
         </div>
     )
 }
