@@ -106,11 +106,13 @@ export function DualAxisChart() {
 
     return (
         <div className="w-full h-full flex flex-col glass-card rounded-2xl p-6 border-white/5 relative group hover:border-emerald-500/20 transition-all">
-            {/* Header Area: Title & Tabs */}
+            {/* Header Area: Title & Tabs - Readable */}
             <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-6 gap-4">
                 <div>
-                    <h3 className="text-xl font-black text-white tracking-tight uppercase">에너지 마켓 트렌드 (7일)</h3>
-                    <p className="text-sm text-slate-500 font-bold mt-1.5">주요 에너지 지표 통합 분석 및 추이 정보</p>
+                    <h3 className="text-base font-black text-white tracking-tight uppercase flex items-center gap-2">
+                        <Activity className="size-5 text-emerald-500" />
+                        <span>에너지 마켓 트렌드 <span className="text-slate-500 text-sm font-bold ml-1">Market Trend (7D)</span></span>
+                    </h3>
                 </div>
                 <div className="flex gap-1 bg-slate-900/50 p-1.5 rounded-xl border border-white/5">
                     {["ALL", "SMP", "REC", "CARBON"].map((tab) => (
@@ -118,7 +120,7 @@ export function DualAxisChart() {
                             key={tab}
                             onClick={() => setActiveTab(tab as any)}
                             className={cn(
-                                "px-3.5 py-1.5 text-xs font-black uppercase tracking-wider rounded-lg transition-all",
+                                "px-4 py-1.5 text-[11px] font-black uppercase tracking-wider rounded-lg transition-all",
                                 activeTab === tab
                                     ? "bg-slate-800 text-white shadow-sm"
                                     : "text-slate-500 hover:text-slate-300 hover:bg-white/5"
@@ -130,7 +132,7 @@ export function DualAxisChart() {
                 </div>
             </div>
 
-            {/* Ticker Cards */}
+            {/* Ticker Cards - Improved Density & Font size */}
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
                 {metrics.map((metric, i) => (
                     <div
@@ -139,39 +141,25 @@ export function DualAxisChart() {
                             "rounded-xl p-5 flex flex-col justify-between transition-all cursor-pointer border",
                             activeTab === metric.id || activeTab === "ALL"
                                 ? "bg-white/[0.03] border-white/10"
-                                : "bg-transparent border-transparent opacity-50 hover:opacity-100 hover:bg-white/[0.02]"
+                                : "bg-transparent border-transparent opacity-40 hover:opacity-100 hover:bg-white/[0.02]"
                         )}
                         onClick={() => setActiveTab(metric.id as any)}
                     >
                         <div className="flex justify-between items-start mb-3">
                             <div className="flex items-center gap-2">
-                                <metric.icon className={cn("size-4", metric.color)} />
-                                <div className="flex items-center gap-1.5">
-                                    <span className="text-xs font-black uppercase tracking-widest text-slate-400">{metric.id}</span>
-                                    <TooltipProvider>
-                                        <ShadcnTooltip>
-                                            <TooltipTrigger asChild onClick={(e) => e.stopPropagation()}>
-                                                <button className="text-slate-600 hover:text-slate-400">
-                                                    <Info className="size-3" />
-                                                </button>
-                                            </TooltipTrigger>
-                                            <TooltipContent className="bg-slate-900 border-white/10 text-white text-[13px] max-w-[220px] p-4 leading-relaxed">
-                                                {(metric as any).description}
-                                            </TooltipContent>
-                                        </ShadcnTooltip>
-                                    </TooltipProvider>
-                                </div>
+                                <metric.icon className={cn("size-4.5", metric.color)} />
+                                <span className="text-[11px] font-black uppercase tracking-[0.2em] text-slate-500">{metric.id}</span>
                             </div>
-                            <div className={cn("flex items-center gap-1 text-[11px] font-bold",
+                            <div className={cn("flex items-center gap-1.5 text-[11px] font-black",
                                 metric.change > 0 ? "text-red-400" : metric.change < 0 ? "text-blue-400" : "text-slate-400"
                             )}>
                                 {metric.change > 0 ? <TrendingUp className="size-3.5" /> : metric.change < 0 ? <TrendingDown className="size-3.5" /> : <Minus className="size-3.5" />}
-                                {Math.abs(metric.change).toFixed(2)}%
+                                {Math.abs(metric.change).toFixed(1)}%
                             </div>
                         </div>
-                        <div className="flex items-baseline gap-1.5">
-                            <span className="text-2xl font-black text-white font-mono tracking-tighter">{metric.value}</span>
-                            <span className="text-xs text-slate-500 font-bold">{metric.unit}</span>
+                        <div className="flex items-baseline gap-2">
+                            <span className="text-2xl font-black text-white font-mono tracking-tighter leading-none">{metric.value}</span>
+                            <span className="text-[11px] text-slate-600 font-bold uppercase tracking-tighter leading-none">{metric.unit}</span>
                         </div>
                     </div>
                 ))}
