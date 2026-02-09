@@ -444,7 +444,7 @@ export default function GreenCheckPage() {
                                         }}
                                         itemStyle={{ color: '#10b981', fontWeight: 'bold' }}
                                         labelStyle={{ color: '#94a3b8', marginBottom: '4px', fontWeight: 'bold' }}
-                                        formatter={(value: number) => [`${value.toLocaleString()} 만원`, '예상 매출']}
+                                        formatter={(value: any) => [`${Number(value).toLocaleString()} 만원`, '예상 매출']}
                                     />
                                     <Line
                                         type="monotone"
