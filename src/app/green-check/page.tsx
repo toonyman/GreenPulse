@@ -4,7 +4,7 @@ import { useState, useEffect } from "react"
 import { Card } from "@/components/ui/card"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Badge } from "@/components/ui/badge"
-import { Radar, RadarChart, PolarGrid, PolarAngleAxis, PolarRadiusAxis, ResponsiveContainer, Tooltip } from "recharts"
+import { Radar, RadarChart, PolarGrid, PolarAngleAxis, PolarRadiusAxis, ResponsiveContainer, Tooltip, LineChart, Line, XAxis, YAxis, CartesianGrid } from "recharts"
 import { MapPin, TrendingUp, Zap, Network, DollarSign, Award, Sparkles, Info } from "lucide-react"
 import {
     Tooltip as ShadcnTooltip,
@@ -38,6 +38,7 @@ export default function GreenCheckPage() {
     const [selectedProvince, setSelectedProvince] = useState<string>("")
     const [selectedRegion, setSelectedRegion] = useState<string>("")
     const [currentData, setCurrentData] = useState<LocationData | null>(null)
+    const [installationCapacity, setInstallationCapacity] = useState<number>(10) // 기본 10kW
 
     // 데이터 로드
     useEffect(() => {
@@ -112,6 +113,38 @@ export default function GreenCheckPage() {
             default: return '미흡'
         }
     }
+
+    // 수익 계산 로직
+    const calculateRevenue = () => {
+        if (!currentData) return { monthly: 0, yearly: 0, tenYears: [] }
+
+        // 일평균 발전시간 (solar_score 0~100 -> 3.0~4.0시간 매핑)
+        const dailyGenHours = 3.0 + (currentData.solar_score / 100)
+        // 발전량 (kWh/월) = 용량(kW) * 일평균발전시간 * 30일
+        const monthlyGeneration = installationCapacity * dailyGenHours * 30
+        // 예상 단가 (SMP + REC 합계 약 200원 가정)
+        const unitPrice = 200
+        const monthlyRevenue = Math.floor(monthlyGeneration * unitPrice)
+
+        // 10개년 추이 (매년 0.7% 효율 저감 가정)
+        const tenYearsData = []
+        let currentYearlyRevenue = monthlyRevenue * 12
+        for (let i = 1; i <= 10; i++) {
+            tenYearsData.push({
+                year: `${i}년차`,
+                revenue: Math.floor(currentYearlyRevenue / 10000), // 만원 단위
+            })
+            currentYearlyRevenue *= 0.993 // 0.7% 저감
+        }
+
+        return {
+            monthly: monthlyRevenue,
+            yearly: monthlyRevenue * 12,
+            tenYears: tenYearsData
+        }
+    }
+
+    const revenueInfo = calculateRevenue()
 
     return (
         <div className="container mx-auto px-4 py-8 md:py-12 flex flex-col gap-10 mb-20">
@@ -307,6 +340,130 @@ export default function GreenCheckPage() {
                     </Card>
                 )}
             </div>
+
+            {/* 수익 시뮬레이션 섹션 */}
+            {currentData && (
+                <div className="max-w-7xl mx-auto w-full grid grid-cols-1 lg:grid-cols-2 gap-6">
+                    {/* 좌측: 설정 및 요약 */}
+                    <Card className="glass-card rounded-2xl p-8 border-white/5 space-y-8">
+                        <div>
+                            <div className="flex items-center gap-2 mb-6">
+                                <DollarSign className="size-5 text-emerald-500" />
+                                <h2 className="text-xl font-black text-white uppercase tracking-tight">수익성 시뮬레이션</h2>
+                            </div>
+
+                            <div className="space-y-6">
+                                <div className="space-y-3">
+                                    <div className="flex justify-between items-end">
+                                        <label className="text-sm font-bold text-slate-400">설치 용량 설정</label>
+                                        <div className="text-2xl font-black text-emerald-400">{installationCapacity} <span className="text-sm text-slate-500">kW</span></div>
+                                    </div>
+                                    <input
+                                        type="range"
+                                        min="3"
+                                        max="100"
+                                        step="1"
+                                        value={installationCapacity}
+                                        onChange={(e) => setInstallationCapacity(Number(e.target.value))}
+                                        className="w-full h-2 bg-white/10 rounded-lg appearance-none cursor-pointer accent-emerald-500"
+                                    />
+                                    <div className="flex justify-between text-[10px] font-bold text-slate-600 uppercase tracking-widest">
+                                        <span>3kW (가정용)</span>
+                                        <span>100kW (상업용)</span>
+                                    </div>
+                                </div>
+
+                                <div className="grid grid-cols-2 gap-4 pt-4">
+                                    <div className="p-5 bg-white/5 rounded-2xl border border-white/10">
+                                        <div className="text-xs font-bold text-slate-500 mb-1 uppercase">월 예상 수익</div>
+                                        <div className="text-xl font-black text-white">
+                                            {revenueInfo.monthly.toLocaleString()} <span className="text-xs font-medium text-slate-500">원</span>
+                                        </div>
+                                    </div>
+                                    <div className="p-5 bg-white/5 rounded-2xl border border-white/10 text-emerald-400">
+                                        <div className="text-xs font-bold text-slate-500 mb-1 uppercase">연 예상 수익</div>
+                                        <div className="text-xl font-black">
+                                            {revenueInfo.yearly.toLocaleString()} <span className="text-xs font-medium text-slate-500">원</span>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div className="p-6 bg-emerald-500/5 rounded-2xl border border-emerald-500/10">
+                                    <div className="flex items-start gap-4">
+                                        <div className="p-2 bg-emerald-500/20 rounded-xl">
+                                            <Zap className="size-5 text-emerald-400" />
+                                        </div>
+                                        <div>
+                                            <div className="text-sm font-black text-white mb-1">발전소 기대 효과</div>
+                                            <p className="text-sm text-slate-400 leading-relaxed font-medium">
+                                                {currentData.name}의 일사량({currentData.solar_score}점)을 고려할 때,
+                                                연간 약 {(revenueInfo.yearly / 200).toLocaleString(undefined, { maximumFractionDigits: 0 })}kWh의 전력을 생산할 수 있습니다.
+                                                이는 4인 가구 약 {Math.floor(revenueInfo.yearly / 200 / 4200)}세대가 1년간 사용할 수 있는 양입니다.
+                                            </p>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </Card>
+
+                    {/* 우측: 10개년 그래프 */}
+                    <Card className="glass-card rounded-2xl p-8 border-white/5 flex flex-col">
+                        <div className="flex items-center justify-between mb-8">
+                            <div className="flex items-center gap-2">
+                                <TrendingUp className="size-5 text-emerald-500" />
+                                <h2 className="text-xl font-black text-white uppercase tracking-tight">10개년 매출 추이 예상</h2>
+                            </div>
+                            <div className="text-[10px] font-black bg-white/5 text-slate-500 px-2 py-1 rounded border border-white/10 tracking-widest uppercase">
+                                단위: 만원
+                            </div>
+                        </div>
+
+                        <div className="flex-1 min-h-[300px] w-full">
+                            <ResponsiveContainer width="100%" height="100%">
+                                <LineChart data={revenueInfo.tenYears} margin={{ top: 10, right: 10, left: 0, bottom: 0 }}>
+                                    <CartesianGrid strokeDasharray="3 3" stroke="#ffffff05" vertical={false} />
+                                    <XAxis
+                                        dataKey="year"
+                                        axisLine={false}
+                                        tickLine={false}
+                                        tick={{ fill: '#475569', fontSize: 11, fontWeight: 'bold' }}
+                                        dy={10}
+                                    />
+                                    <YAxis
+                                        axisLine={false}
+                                        tickLine={false}
+                                        tick={{ fill: '#475569', fontSize: 11, fontWeight: 'bold' }}
+                                    />
+                                    <Tooltip
+                                        contentStyle={{
+                                            backgroundColor: '#0f172a',
+                                            border: '1px solid rgba(255,255,255,0.1)',
+                                            borderRadius: '12px',
+                                            padding: '12px'
+                                        }}
+                                        itemStyle={{ color: '#10b981', fontWeight: 'bold' }}
+                                        labelStyle={{ color: '#94a3b8', marginBottom: '4px', fontWeight: 'bold' }}
+                                        formatter={(value: number) => [`${value.toLocaleString()} 만원`, '예상 매출']}
+                                    />
+                                    <Line
+                                        type="monotone"
+                                        dataKey="revenue"
+                                        stroke="#10b981"
+                                        strokeWidth={4}
+                                        dot={{ r: 4, fill: '#10b981', strokeWidth: 2, stroke: '#0f172a' }}
+                                        activeDot={{ r: 6, strokeWidth: 0 }}
+                                        animationDuration={1500}
+                                    />
+                                </LineChart>
+                            </ResponsiveContainer>
+                        </div>
+                        <p className="mt-4 text-[11px] text-slate-500 font-medium text-center">
+                            * 본 시뮬레이션은 SMP 120원, REC 80원을 기준으로 하며, 실제 기상 조건 및 정책에 따라 달라질 수 있습니다.
+                        </p>
+                    </Card>
+                </div>
+            )}
         </div>
     )
 }
